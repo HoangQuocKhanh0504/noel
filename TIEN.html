@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thiệp Giáng Sinh gửi Tiên</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22 fill=%22red%22><path d=%22M50 85 L10 45 A20 20 0 0 1 50 15 A20 20 0 0 1 90 45 Z%22/></svg>">
+
+<style>
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:radial-gradient(circle at top,#1b4965,#0f4c75,#000814);
+    color:white;
+    margin:0;
+    padding:20px;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow-x:hidden;
+}
+
+/* CARD */
+.card{
+    position:relative;
+    width:min(92vw,420px);
+    min-height:360px;
+    border-radius:16px;
+    perspective:1200px;
+}
+
+.card-inner{
+    position:relative;
+    width:100%;
+    min-height:360px;
+    transform-style:preserve-3d;
+    transition:transform .8s cubic-bezier(.4,.2,.2,1);
+}
+
+.card.flipped .card-inner{
+    transform:rotateY(180deg);
+}
+
+/* FACE */
+.front,.back{
+    position:absolute;
+    inset:0;
+    border-radius:16px;
+    backface-visibility:hidden;
+    padding:24px;
+    box-shadow:0 20px 40px rgba(0,0,0,.35);
+}
+
+.front{
+    background:linear-gradient(135deg,#ff6b6b,#feca57);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+.back{
+    background:linear-gradient(135deg,#48cae4,#023e8a);
+    transform:rotateY(180deg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+}
+
+/* TEXT */
+h1{
+    font-size:22px;
+    margin-bottom:10px;
+}
+
+.click-hint{
+    font-size:14px;
+    opacity:.85;
+}
+
+.message{
+    font-size:17px;
+    line-height:1.65;
+    overflow-y:auto;
+    max-height:215px;
+    padding-right:6px;
+
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+}
+.message::-webkit-scrollbar{display:none;}
+
+/* FADE */
+.fade-bottom{
+    position:absolute;
+    bottom:48px;
+    left:0;
+    width:100%;
+    height:80px;
+    pointer-events:none;
+    background:linear-gradient(
+        to bottom,
+        rgba(2,62,138,0),
+        rgba(2,62,138,.9)
+    );
+}
+
+/* SIGNATURE */
+.name{
+    margin-top:auto;
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+    z-index:1;
+}
+
+/* MOBILE */
+@media(max-width:480px){
+    h1{font-size:20px;}
+    .message{font-size:16px; max-height:200px;}
+}
+
+/* SNOW */
+.snow{
+    position:fixed;
+    top:-10px;
+    background:white;
+    border-radius:50%;
+    opacity:.9;
+    animation:fall linear infinite;
+    pointer-events:none;
+}
+
+@keyframes fall{
+    to{transform:translateY(110vh);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+    <div class="card-inner">
+
+        <div class="front">
+            <h1>🎄 Gửi em Tiên, Giáng Sinh này 🎄</h1>
+            <p class="click-hint">Chạm vào đây, anh có điều muốn nói với em</p>
+        </div>
+
+        <div class="back">
+            <div class="message" id="message">
+                Tiên à,<br><br>
+
+                Giáng Sinh này anh không ước điều gì thật lớn lao,<br>
+                chỉ mong mỗi ngày của em trôi qua đều nhẹ nhàng hơn,<br>
+                có niềm vui nhỏ, có nụ cười quen,<br>
+                và khi em cần, luôn có anh ở bên cạnh em.<br><br>
+
+                Cảm ơn Tiên vì đã đến trong cuộc sống của anh,<br>
+                vì đã chọn ở lại,<br>
+                và vì đã yêu anh bằng tất cả sự dịu dàng của em.<br><br>
+
+                Dù tương lai có thế nào đi nữa,<br>
+                anh vẫn luôn trân trọng em,<br>
+                trân trọng từng khoảnh khắc có em trong đời.<br><br>
+
+                Giáng Sinh an lành nhé, người anh yêu.
+            </div>
+
+            <div class="fade-bottom" id="fade"></div>
+
+            <div class="name">— Khánh ❤️</div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const card=document.getElementById('card');
+card.addEventListener('click',()=>{
+    card.classList.toggle('flipped');
+});
+
+const msg=document.getElementById('message');
+const fade=document.getElementById('fade');
+
+msg.addEventListener('scroll',()=>{
+    const atBottom =
+        msg.scrollTop + msg.clientHeight >= msg.scrollHeight - 5;
+    fade.style.opacity = atBottom ? '0' : '1';
+});
+
+function createSnow(){
+    const snow=document.createElement('div');
+    snow.className='snow';
+
+    const size=Math.random()*6+4;
+    snow.style.width=size+'px';
+    snow.style.height=size+'px';
+    snow.style.left=Math.random()*100+'vw';
+    snow.style.animationDuration=(Math.random()*3+3)+'s';
+
+    document.body.appendChild(snow);
+    setTimeout(()=>snow.remove(),9000);
+}
+setInterval(createSnow,180);
+</script>
+
+</body>
+</html>
