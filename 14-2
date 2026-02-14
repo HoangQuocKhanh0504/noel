@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi Tiên - 14/2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #ffdde1 0%, #ffb6c1 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background trái tim bay */
+        .bg-hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .heart-float {
+            position: absolute;
+            color: rgba(255, 80, 120, 0.3);
+            font-size: 24px;
+            animation: float 8s infinite linear;
+            bottom: -50px;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0); opacity: 0.6; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Thiệp chính */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 40px 30px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(255, 30, 100, 0.2);
+            border: 3px solid white;
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: #d43f6b;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 0 #ffc1cc;
+        }
+
+        .to-name {
+            background: #ff90b0;
+            color: white;
+            font-size: 2.5rem;
+            padding: 10px 30px;
+            border-radius: 60px;
+            display: inline-block;
+            margin: 20px 0;
+            box-shadow: 0 6px 0 #b34167;
+            font-weight: bold;
+        }
+
+        /* Lời chúc chính - đã dài hơn */
+        .message {
+            background: white;
+            border-radius: 50px;
+            padding: 35px 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 0 #ffb0c0;
+            border: 2px solid #ffe2eb;
+            text-align: left;
+        }
+
+        .message p {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: #4a2a33;
+            margin: 15px 0;
+        }
+
+        .message p:first-child {
+            margin-top: 0;
+        }
+
+        .heart-row {
+            text-align: center;
+            font-size: 2.2rem;
+            margin: 20px 0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .signature {
+            font-size: 2rem;
+            color: #d43f6b;
+            font-style: italic;
+            text-align: right;
+            margin-top: 25px;
+            border-top: 2px dashed #ffb6c1;
+            padding-top: 20px;
+        }
+
+        /* Nút bấm */
+        .btn {
+            background: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            color: #c1224f;
+            font-weight: bold;
+            margin: 15px 0 10px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #f8a5b7;
+            transition: 0.1s linear;
+            border: 2px solid #ffe7ed;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #f8a5b7;
+        }
+
+        /* Popup nhập mật khẩu */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-box {
+            background: #fff0f5;
+            padding: 30px 25px;
+            border-radius: 50px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border: 4px solid white;
+            box-shadow: 0 20px 30px rgba(200, 50, 100, 0.3);
+        }
+
+        .popup-box h3 {
+            font-size: 2rem;
+            color: #b33f66;
+            margin-bottom: 20px;
+        }
+
+        .popup-box input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.3rem;
+            border: 3px solid #ffb0c0;
+            border-radius: 60px;
+            outline: none;
+            text-align: center;
+            margin: 15px 0;
+            background: white;
+        }
+
+        .popup-box input:focus {
+            border-color: #ff6699;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .popup-btn {
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+            flex: 1;
+        }
+
+        .popup-btn.confirm {
+            background: #ff8aad;
+            color: white;
+            box-shadow: 0 4px 0 #b34167;
+        }
+
+        .popup-btn.confirm:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .popup-btn.cancel {
+            background: #e0e0e0;
+            color: #666;
+            box-shadow: 0 4px 0 #999;
+        }
+
+        .popup-btn.cancel:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* Nội dung bí mật sau khi nhập đúng */
+        .secret-content {
+            background: #ffe4ec;
+            border-radius: 40px;
+            padding: 25px;
+            margin-top: 20px;
+            font-size: 1.3rem;
+            color: #a13053;
+            border: 3px dotted #ff80a5;
+            display: none;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .secret-content.show {
+            display: block;
+        }
+
+        .secret-content i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 1.2rem;
+            color: #b34167;
+            background: rgba(255,255,255,0.6);
+            padding: 12px;
+            border-radius: 40px;
+        }
+
+        @media (max-width: 500px) {
+            h1 { font-size: 2.5rem; }
+            .to-name { font-size: 2rem; }
+            .message p { font-size: 1.1rem; }
+            .popup-box { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background hiệu ứng -->
+    <div class="bg-hearts" id="heartBackground"></div>
+
+    <!-- Thiệp chính -->
+    <div class="card">
+        <h1>14/2</h1>
+        <div style="font-size:1.3rem; color:#c95f7f;">💕 Valentine ngọt ngào 💕</div>
+        
+        <div class="to-name">
+            ✨ Gửi Tiên ✨
+        </div>
+
+        <!-- Lời chúc dài hơn -->
+        <div class="message">
+            <p>Tiên yêu quý,</p>
+            
+            <p>Hôm nay là ngày 14/2 - ngày của tình yêu. Anh không biết nói gì hơn ngoài việc cảm ơn em vì đã xuất hiện trong cuộc đời anh. Em giống như một nàng tiên thực sự, mang đến cho anh những điều kỳ diệu mà anh chưa từng có.</p>
+            
+            <p>Anh yêu cách em cười, yêu cách em nói chuyện, yêu cả những lúc em giận dỗi dễ thương. Mỗi ngày bên em là một ngày anh thấy mình may mắn hơn.</p>
+            
+            <p>Chúc em luôn vui vẻ, hạnh phúc, và luôn là Tiên nhí nhảnh của anh. Dù có chuyện gì xảy ra, anh vẫn sẽ ở đây, bên cạnh em, yêu thương em và che chở cho em.</p>
+            
+            <p>Mong rằng chúng mình sẽ còn thật nhiều Valentine bên nhau, cùng nhau tạo nên những kỷ niệm đẹp.</p>
+            
+            <div class="heart-row">
+                ❤️ 🌸 ❤️ 🌸 ❤️
+            </div>
+
+            <p>Yêu em rất nhiều!</p>
+            
+            <div class="signature">
+                Người yêu của Tiên ❤️
+            </div>
+        </div>
+
+        <!-- Nút bấm để mở popup mật khẩu -->
+        <button class="btn" id="secretBtn">
+            🔐 Điều bí mật dành cho em
+        </button>
+
+        <!-- Ghi chú nhỏ -->
+        <div style="font-size:1rem; color:#b33f66; margin:5px 0 15px; font-style:italic;">
+            (em chắc cũng sẽ biết mật khẩu mà 🤭)
+        </div>
+
+        <!-- Nội dung bí mật (sẽ hiện sau khi nhập đúng mật khẩu) -->
+        <div id="secretMessage" class="secret-content">
+            <i>💌</i>
+            Bí mật nè: Anh đã yêu em từ cái nhìn đầu tiên! Mỗi lần nhìn thấy em, tim anh lại đập nhanh hơn. Em là món quà tuyệt vời nhất mà cuộc sống đã ban tặng cho anh. Cảm ơn em vì tất cả!<br>
+            <span style="display:block; margin-top:15px;">🐰❤️ Tiên của anh ❤️🐰</span>
+        </div>
+
+        <div class="footer">
+            ❤️ 14/2/2025 - Yêu em mãi mãi ❤️
+        </div>
+    </div>
+
+    <!-- Popup nhập mật khẩu -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-box">
+            <h3>🔒 Nhập mật khẩu</h3>
+            <input type="password" id="passwordInput" placeholder="Nhập mật khẩu..." maxlength="10">
+            <div class="popup-buttons">
+                <button class="popup-btn cancel" id="cancelBtn">Hủy</button>
+                <button class="popup-btn confirm" id="confirmBtn">Xác nhận</button>
+            </div>
+            <div style="margin-top:12px; color:#c95f7f; font-size:0.9rem;" id="hintText">(gợi ý: 6 số, em biết mà 😉)</div>
+        </div>
+    </div>
+
+    <script>
+        // Tạo background trái tim
+        const bg = document.getElementById('heartBackground');
+        for (let i = 0; i < 25; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-float';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (Math.random() * 5 + 6) + 's';
+            heart.style.animationDelay = Math.random() * 3 + 's';
+            heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            const icons = ['❤️', '🧡', '💖', '💗', '🌸', '🌺', '💕', '💘'];
+            heart.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            bg.appendChild(heart);
+        }
+
+        // Lấy các element
+        const secretBtn = document.getElementById('secretBtn');
+        const popupOverlay = document.getElementById('popupOverlay');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const passwordInput = document.getElementById('passwordInput');
+        const secretMessage = document.getElementById('secretMessage');
+        const hintText = document.getElementById('hintText');
+
+        // Mật khẩu đúng
+        const CORRECT_PASSWORD = '210111';
+
+        // Hiện popup khi nhấn nút
+        secretBtn.addEventListener('click', () => {
+            popupOverlay.style.display = 'flex';
+            passwordInput.value = ''; // Xóa input cũ
+            passwordInput.focus();
+        });
+
+        // Đóng popup (hủy)
+        cancelBtn.addEventListener('click', () => {
+            popupOverlay.style.display = 'none';
+        });
+
+        // Click bên ngoài popup thì đóng (tùy chọn)
+        popupOverlay.addEventListener('click', (e) => {
+            if (e.target === popupOverlay) {
+                popupOverlay.style.display = 'none';
+            }
+        });
+
+        // Xác nhận mật khẩu
+        confirmBtn.addEventListener('click', checkPassword);
+        
+        // Nhấn Enter trong input cũng xác nhận
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        function checkPassword() {
+            const enteredPassword = passwordInput.value.trim();
+            
+            if (enteredPassword === CORRECT_PASSWORD) {
+                // Đúng mật khẩu: hiện nội dung bí mật, ẩn popup
+                secretMessage.classList.add('show');
+                popupOverlay.style.display = 'none';
+                // Cuộc nhẹ xuống nội dung bí mật (nếu muốn)
+                setTimeout(() => {
+                    secretMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 200);
+            } else {
+                // Sai mật khẩu: thông báo (nhẹ nhàng)
+                hintText.innerHTML = '❌ Sai mật khẩu rồi, thử lại nha! (gợi ý: 210111)';
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+    </script>
+</body>
+</html>
